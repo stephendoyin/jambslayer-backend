@@ -1,6 +1,7 @@
 module.exports = {
   "parser": 'babel-eslint',
   "env": {
+    "browser": true,
     "commonjs": true,
     "es6": true,
     "node": true
@@ -12,6 +13,7 @@ module.exports = {
     },
     "sourceType": "module"
   },
+  "plugins": [ "react" ],
   "rules": {
     "indent": ["error", 2],
     "linebreak-style": ["error","unix"],

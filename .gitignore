@@ -3,3 +3,4 @@
 /dist/server.generated.js
 /data/
 npm-debug.log
+/config/
