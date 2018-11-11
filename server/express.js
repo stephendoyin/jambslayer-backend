@@ -1,13 +1,13 @@
-import express from 'express';
-import path from 'path';
 import bodyParser from 'body-parser';
-import cookieParser from 'cookie-parser';
 import compress from 'compression';
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import express from 'express';
 import helmet from 'helmet';
-import userRoutes from './routes/user.routes';
+import path from 'path';
 import authRoutes from './routes/auth.routes';
-
+import postRoutes from './routes/post.routes';
+import userRoutes from './routes/user.routes';
 
 const CURRENT_WORKING_DIR = process.cwd();
 const app = express();
@@ -28,6 +28,7 @@ app.use('/dist', express.static(path.join(CURRENT_WORKING_DIR, 'dist')));
 // mount routes
 app.use('/', userRoutes);
 app.use('/', authRoutes);
+app.use('/', postRoutes);
 
 // Catch unauthorised errors
 app.use((err, req, res, next) => {

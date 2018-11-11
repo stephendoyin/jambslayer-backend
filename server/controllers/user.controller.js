@@ -14,7 +14,7 @@ const create = (req, res, next) => {
             message: "Successfully signed up!"
         })
     })
-}
+};
 
 /**
  * Load user and append to req.

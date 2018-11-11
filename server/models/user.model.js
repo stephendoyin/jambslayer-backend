@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 const saltRounds = 10;
 const UserSchema = new mongoose.Schema({
-    //facebook: String,
     name: {
         type: String,
         trim: true,

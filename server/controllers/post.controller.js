@@ -22,9 +22,11 @@ const create = (req, res, next) => {
         post.save((err, result) => {
             if(err){
                 return res.status(400).json({
-                    error: errorHandler.gerErrorMessage(err)
+                    error: err
                 });
             }
+            result.postedBy.salt = undefined;
+            result.postedBy.hashed_password = undefined;
             res.json(result);
         })
     })
