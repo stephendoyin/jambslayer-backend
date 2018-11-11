@@ -1,6 +1,8 @@
 import Post from '../models/post.model';
 import _ from 'lodash';
 import errorHandler from './../helpers/dbErrorHandler';
+import fs from 'fs';
+import formidable from 'formidable';
 
 const create = (req, res, next) => {
     let form = new formidable.IncomingForm();
@@ -8,10 +10,27 @@ const create = (req, res, next) => {
     form.parse(req,(err, fields, files) => {
         if(err){
             return res.status(400).json({
-                error: "Post couldn't be uploaded"
+                error: "Image unable to upload"
             });
         }
         let post = new Post(fields);
-        post.posted
+        post.postedBy = req.profile;
+        if(files.photo){
+            post.photo.data = fs.readFileSync(files.photo.path);
+            post.photo.contentType = files.photo.type;
+        }
+        post.save((err, result) => {
+            if(err){
+                return res.status(400).json({
+                    error: errorHandler.gerErrorMessage(err)
+                });
+            }
+            res.json(result);
+        })
     })
+};
+
+export default {
+    create
 }
+
