@@ -12,12 +12,16 @@ const PostSchema = new mongoose.Schema({
     created: {
         type: Date,
         default: Date.now
+    }, tag: {
+        type: String,
+        required: 'tag cannot be empty'
     },
-    Answers: [{
+    answers: [{
         content: {
             type: String,
             required: 'Empty Post'
         },
+        postedBy: { type: mongoose.Schema.ObjectId, ref: 'User' },
         photo: {
             data: Buffer,
             contentType: String
@@ -26,16 +30,12 @@ const PostSchema = new mongoose.Schema({
         likes: [{ type: mongoose.Schema.ObjectId, ref: 'User' }],
         created: { type: Date, default: Date.now },
         comments: [{
-            likes: [{type: mongoose.Schema.ObjectId, ref: 'User'}],
+            likes: [{ type: mongoose.Schema.ObjectId, ref: 'User' }],
             text: String,
             created: { type: Date, default: Date.now },
             postedBy: { type: mongoose.Schema.ObjectId, ref: 'User' }
         }]
     }],
-    tag: {
-        type: String,
-        required: 'tag cannot be empty'
-}
 });
 
 // const PostSchema = new mongoose.Schema({
@@ -59,5 +59,5 @@ const PostSchema = new mongoose.Schema({
 //       default: Date.now
 //     }
 //   })
-  
+
 export default mongoose.model('Post', PostSchema);

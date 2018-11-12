@@ -52,6 +52,8 @@ const hasAuthorization = (req, res, next) => {
     next();
 };
 
+
+
 export default {
     signin,
     signout,

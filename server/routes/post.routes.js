@@ -8,9 +8,9 @@ const router = express.Router();
 router.route('/api/posts/new/:userId')
   .post(authCtrl.requireSignin, postCtrl.create);
 
-//api for posting answers to question
-// router.route('/api/posts/answer/new/:userId')
-//     .get(authCtrl.requireSignin, postCtrl.createAns);
+
+router.route('/api/posts/answer')
+  .put(authCtrl.requireSignin, postCtrl.answer);
 
 // //api to get photed that may be posted with answers
 // router.route('/api/posts/photo/answer/:postId')
@@ -58,6 +58,6 @@ router.route('/api/posts/new/:userId')
 
 router.param('userId', userCtrl.userByID);
 // router.param('postId', postCtrl.postByID);
-// router.param('answerId', postCtrl.answerID);
+//router.param('answerId', postCtrl.answerID);
 
 export default router;
