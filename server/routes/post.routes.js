@@ -6,11 +6,11 @@ import postCtrl from '../controllers/post.controller'
 const router = express.Router();
 
 router.route('/api/posts/new/:userId')
-  .post(authCtrl.requireSignin, postCtrl.create);
+  .post(authCtrl.requireSignin, postCtrl.createPost);
 
 
-router.route('/api/posts/answer')
-  .put(authCtrl.requireSignin, postCtrl.answer);
+router.route('/api/posts/answers/:userId')
+  .put(authCtrl.requireSignin, postCtrl.createAnswer, postCtrl.answers);
 
 // //api to get photed that may be posted with answers
 // router.route('/api/posts/photo/answer/:postId')
@@ -24,11 +24,15 @@ router.route('/api/posts/answer')
 // router.route('/api/posts/by/:userId')
 //     .get(authCtrl.requireSignin, postCtrl.listByUser);
 
-// //api to add comment to answers
-// router.route('/api/post/answer/comment')
-//     .put(authCtrl.requireSignin, postCtrl.comment);
+//api to add comment to answers
+router.route('/api/post/answer/comment/:userId')
+  .put(authCtrl.requireSignin, postCtrl.comment);
 
-// //api to remove comment
+  //api to add reply to comment
+router.route('/api/post/answer/comment/reply/:userId')
+  .put(authCtrl.requireSignin, postCtrl.reply);
+
+// api to remove comment
 // router.route('/api/post/answer/uncomment')
 //     .put(authCtrl.requireSignin, postCtrl.uncomment);
 

@@ -1,10 +1,14 @@
 import Post from '../models/post.model';
+import Answer from '../models/answers.model';
+import Comment from '../models/comments.model';
+import Reply from '../models/replies.model'
 import _ from 'lodash';
 import errHandler from './../helpers/dbErrorHandler';
 import fs from 'fs';
 import formidable from 'formidable';
 
-const create = (req, res, next) => {
+//post new question 
+const createPost = (req, res, next) => {
     let form = new formidable.IncomingForm();
     form.keepExtensions = true;
     form.parse(req, (err, fields, files) => {
@@ -32,26 +36,92 @@ const create = (req, res, next) => {
     })
 };
 
-const answer = (req, res) => {
-    let answer = {};
-    answer.content = req.body.answer;
-    answer.postedBy = req.body.userId;
-    console.log(answer)
-    Post.findByIdAndUpdate(req.body.postId, {$push: {answers: answer}}, {new: true})
-    .populate('answers.postedBy', '_id name')
-    .populate('postedBy', '_id name')
-    .exec((err, result) => {
-      if (err) {
-        return res.status(400).json({
-          error: errHandler.getErrorMessage(err)
-        })
-      }
-      res.json(result)
+const createAnswer = (req, res, next) => {
+    let answer = new Answer();
+    answer.content = req.body.content;
+    answer.postedBy = req.profile;
+    answer.postID = req.body.postId;
+    answer.save((err, result) => {
+        if (err) {
+            return res.status(400).json({
+                error: err
+            })
+        }
+        next();
     })
-  }
+}
+
+const answers = (req, res) => {
+    Answer.find({ 'postID': req.body.postId })
+        .sort({ created: 'asc' })
+        .populate('postedBy', ['name', 'created', '_id'])
+        .exec((err, result) => {
+            if (err) {
+                return res.status(400).json({
+                    error: errHandler.getErrorMessage(err)
+                })
+            }
+            res.json(result)
+        });
+};
+
+const comment = (req, res) => {
+    let comment = new Comment();
+    comment.content = req.body.content;
+    comment.postedBy = req.profile;
+    comment.answerID = req.body.answerId;
+    comment.save((err, result) => {
+        if (err) {
+            return res.status(400).json({
+                error: errHandler.getErrorMessage(err)
+            })
+        }
+        Comment.find({ 'answerID': req.body.answerId })
+            .populate('postedBy', ['name', 'created', '_id'])
+            .sort('-created')
+            .exec((err, comments) => {
+                if (err) {
+                    return res.status(400).json({
+                        error: errorHandler.getErrorMessage(err)
+                    });
+                }
+                res.json(comments);
+            });
+    });
+};
+
+const reply = (req, res) => {
+    let reply = new Reply();
+    reply.content = req.body.content;
+    reply.postedBy = req.profile;
+    reply.commentID = req.body.commentId;
+    reply.save((err, result) => {
+        if (err) {
+            return res.status(400).json({
+                error: errHandler.getErrorMessage(err)
+            })
+        }
+        Reply.find({ 'commentID': req.body.commentId })
+            .populate('postedBy', ['name', 'created', '_id'])
+            .sort('-created')
+            .exec((err, replies) => {
+                if (err) {
+                    return res.status(400).json({
+                        error: errorHandler.getErrorMessage(err)
+                    });
+                }
+                res.json(replies);
+            });
+    });
+}
+
+
 
 export default {
-    create,
-    answer
+    createPost,
+    answers,
+    createAnswer,
+    comment,
+    reply
 }
 
