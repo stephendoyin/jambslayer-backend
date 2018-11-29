@@ -8,6 +8,8 @@ const router = express.Router();
 router.route('/api/posts/new/:userId')
   .post(authCtrl.requireSignin, postCtrl.createPost);
 
+// router.route('/api/posts/photo/:postId')
+//   .get(postCtrl.photo)
 
 router.route('/api/posts/answers/:userId')
   .put(authCtrl.requireSignin, postCtrl.createAnswer, postCtrl.answers);
@@ -28,7 +30,7 @@ router.route('/api/posts/answers/:userId')
 router.route('/api/post/answer/comment/:userId')
   .put(authCtrl.requireSignin, postCtrl.comment);
 
-  //api to add reply to comment
+//api to add reply to comment
 router.route('/api/post/answer/comment/reply/:userId')
   .put(authCtrl.requireSignin, postCtrl.reply);
 
@@ -61,7 +63,7 @@ router.route('/api/post/answer/comment/reply/:userId')
 //     .put(authCtrl.requireSignin, postCtrl.isAnswerer, postCtrl.editAnswer);
 
 router.param('userId', userCtrl.userByID);
-// router.param('postId', postCtrl.postByID);
+//router.param('postId', postCtrl.postByID);
 //router.param('answerId', postCtrl.answerID);
 
 export default router;

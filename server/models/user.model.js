@@ -31,6 +31,9 @@ const UserSchema = new mongoose.Schema({
     photo: {
         data: Buffer,
         contentType: String
+    },
+    passwordlastChanged: {
+        type: Date
     }
 });
 
@@ -39,7 +42,7 @@ UserSchema
     .set(function (password) {
         this._password = password
         this.salt = this.makeSalt()
-        this.hashed_password = this.encryptPassword(password)
+        this.hashed_password = this.encryptPassword(password);
     })
     .get(function () {
         return this._password
@@ -50,7 +53,10 @@ UserSchema.path('hashed_password').validate(function (v) {
         this.invalidate('password', 'Password must be at least 6 characters.')
     }
     if (this.isNew && !this._password) {
-        this.invalidate('password', 'Password is required')
+        this.invalidate('password', 'Password is required');
+    }
+    if(!this.isNew && !this._password){
+        this.invalidate('password', 'Password is required');
     }
 }, null)
 
