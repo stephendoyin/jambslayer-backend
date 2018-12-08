@@ -1,7 +1,7 @@
 import Post from '../models/post.model';
 import Answer from '../models/answers.model';
 import Comment from '../models/comments.model';
-import Reply from '../models/replies.model'
+import Reply from '../models/replies.model';
 import _ from 'lodash';
 import errHandler from './../helpers/dbErrorHandler';
 import fs from 'fs';
@@ -36,6 +36,30 @@ const createPost = (req, res, next) => {
     })
 };
 
+const like = (req, res) => {
+    Post.findByIdAndUpdate(req.body.postId, { $push: { likes: req.body.userId } }, { new: true })
+        .exec((err, result) => {
+            if (err) {
+                return res.status(400).json({
+                    error: errorHandler.getErrorMessage(err)
+                });
+            }
+            res.json(result);
+        });
+};
+
+const unlike = (req, res) => {
+    Post.findByIdAndUpdate(req.body.postId, { $pull: { likes: req.body.userId } }, { new: true })
+        .exec((err, result) => {
+            if (err) {
+                return res.status(400).json({
+                    error: errorHandler.getErrorMessage(err)
+                })
+            }
+            res.json(result);
+        });
+}
+
 const postByID = (req, res, next, id) => {
     Post.findById(id).populate('postedBy', '_id name').exec((err, post) => {
         if (err || !post) {
@@ -46,6 +70,22 @@ const postByID = (req, res, next, id) => {
         req.post = post;
         next();
     })
+};
+
+const listNewsFeed = (req, res) => {
+    console.log(req.profile.subject_interests)
+    Post.find({ tag: { $in: ['maths', 'english'] } })
+        .populate('postedBy', '_id name')
+        .sort('-created')
+        .exec((err, posts) => {
+            if (err) {
+                return res.status(400).json({
+                    error: errorHandler.getErrorMessage(err)
+                })
+            }
+            res.json(posts)
+        });
+
 };
 
 const createAnswer = (req, res, next) => {
@@ -125,6 +165,25 @@ const reply = (req, res) => {
                 res.json(replies);
             });
     });
+};
+
+const photo = (req, res, next) => {
+    res.set("Content-Type", req.post.photo.contentType);
+    return res.send(req.post.photo.data);
+};
+
+const remove = (req, res) => {
+    let post = req.post
+    post.remove((err, deletedPost) => {
+        if (err) {
+            return res.status(400).json({
+                error: errorHandler.getErrorMessage(err)
+            })
+        }
+        res.json(deletedPost)
+        //will call next here to further delete answer,
+        //comment and reply related to this post
+    })
 }
 
 const isPoster = (req, res, next) => {
@@ -144,6 +203,11 @@ export default {
     createAnswer,
     comment,
     reply,
-    isPoster
+    isPoster,
+    remove,
+    photo,
+    like,
+    unlike,
+    listNewsFeed
 }
 

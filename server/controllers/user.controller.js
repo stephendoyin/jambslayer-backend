@@ -2,7 +2,12 @@ import User from '../models/user.model'
 import _ from 'lodash';
 import errorHandler from './../helpers/dbErrorHandler';
 import bcrypt from 'bcrypt';
+import formidable from 'formidable';
+import fs from 'fs';
 
+/**
+ * Create new user || register function
+ */
 const create = (req, res, next) => {
     const user = new User(req.body);
     user.save((err, result) => {
@@ -29,24 +34,25 @@ const userByID = (req, res, next, id) => {
         req.profile = user;
         next();
     })
-}
+};
+
 
 const read = (req, res) => {
-    req.profile.hashed_password = undefined
-    req.profile.salt = undefined
-    return res.json(req.profile)
-}
+    req.profile.hashed_password = undefined;
+    req.profile.salt = undefined;
+    return res.json(req.profile);
+};
 
 const list = (req, res) => {
     User.find((err, users) => {
         if (err) {
             return res.status(400).json({
                 error: errorHandler.getErrorMessage(err)
-            })
+            });
         }
-        res.json(users)
+        res.json(users);
     }).select('name email updated created')
-}
+};
 
 const update = (req, res, next) => {
     let form = new formidable.IncomingForm();
@@ -72,22 +78,22 @@ const update = (req, res, next) => {
             }
             user.hashed_password = undefined;
             user.salt = undefined;
-            res.json(user);
+            res.json(result);
         });
     });
 };
 
 const comparePwd = (req, res, next) => {
     let compare = bcrypt.compareSync(req.body.oldPassword, req.profile.hashed_password);
-    if(!compare){
+    if (!compare) {
         return res.status(403).json({
-            error: "old password does not match"
+            error: "user not found"
         });
-    } 
+    }
     next();
 };
 
-const changePwd = (req, res, next) => {
+const changePwd = (req, res) => {
     let user = req.profile;
     user.password = req.body.newPassword;
     user.passwordLastChanged = Date.now();
@@ -96,12 +102,12 @@ const changePwd = (req, res, next) => {
             return res.status(400).json({
                 error: errorHandler.getErrorMessage(err)
             });
-        }console.log(result);
+        }
         res.status(200).json({
             message: "Successfully updated password"
         });
-    })
-}
+    });
+};
 
 const remove = (req, res, next) => {
     let user = req.profile;
@@ -115,7 +121,7 @@ const remove = (req, res, next) => {
         deletedUser.salt = undefined;
         res.json(deletedUser);
     });
-}
+};
 
 export default {
     create,

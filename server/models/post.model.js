@@ -8,6 +8,10 @@ const PostSchema = new mongoose.Schema({
     },
     edited: Boolean,
     likes: [{ type: mongoose.Schema.ObjectId, ref: 'User' }],
+    photo: {
+        data: Buffer,
+        contentType: String
+    },
     postedBy: { type: mongoose.Schema.ObjectId, ref: 'User' },
     tag: {
         type: String,

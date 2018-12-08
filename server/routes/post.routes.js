@@ -8,19 +8,28 @@ const router = express.Router();
 router.route('/api/posts/new/:userId')
   .post(authCtrl.requireSignin, postCtrl.createPost);
 
-// router.route('/api/posts/photo/:postId')
-//   .get(postCtrl.photo)
+//api to delete post
+router.route('/api/posts/:postId')
+  .delete(authCtrl.requireSignin, postCtrl.isPoster, postCtrl.remove);
 
-router.route('/api/posts/answers/:userId')
-  .put(authCtrl.requireSignin, postCtrl.createAnswer, postCtrl.answers);
+router.route('/api/posts/photo/:postId')
+  .get(postCtrl.photo);
 
-// //api to get photed that may be posted with answers
+//api to like post
+router.route('/api/posts/like')
+  .put(authCtrl.requireSignin, postCtrl.like);
+
+//api to unlike post
+router.route('/api/posts/unlike')
+  .put(authCtrl.requireSignin, postCtrl.unlike);
+
+//api that gets post according to user's interest tags
+router.route('/api/posts/feed/:userId')
+    .get(authCtrl.requireSignin, postCtrl.listNewsFeed);
+
+// //api to get photo that may be posted with answers
 // router.route('/api/posts/photo/answer/:postId')
 //     .get(postCtrl.photo);
-
-// //api that gets questions according to users interest tags
-// router.route('/api/posts/feed/:userId')
-//     .get(authCtrl.requireSignin, postCtrl.listNewsFeed);
 
 // //api to view user specific post (questions by user if there is)
 // router.route('/api/posts/by/:userId')
@@ -34,17 +43,12 @@ router.route('/api/post/answer/comment/:userId')
 router.route('/api/post/answer/comment/reply/:userId')
   .put(authCtrl.requireSignin, postCtrl.reply);
 
+router.route('/api/posts/answers/:userId')
+  .put(authCtrl.requireSignin, postCtrl.createAnswer, postCtrl.answers);
+
 // api to remove comment
 // router.route('/api/post/answer/uncomment')
-//     .put(authCtrl.requireSignin, postCtrl.uncomment);
-
-// //api to like post
-// router.route('/api/posts/like')
-//     .put(authCtrl.requireSignin, postCtrl.like);
-
-// //api to remove like
-// router.route('/api/posts/unlike')
-//     .put(authCtrl.requireSignin, postCtrl.unlike);
+//   .put(authCtrl.requireSignin, postCtrl.uncomment);
 
 // //api to like an answer
 // router.route('/api/posts/answer/like')
@@ -54,16 +58,12 @@ router.route('/api/post/answer/comment/reply/:userId')
 // router.route('/api/posts/answer/unlike')
 //     .put(authCtrl.requireSignin, postCtrl.answerUnlike);
 
-// //api to delete post
-// router.route('/api/posts/:postId')
-//     .delete(authCtrl.requireSignin, postCtrl.isPoster, postCtrl.remove);
-
 // //api to edit answer
 // router.route('/api/posts/answer/:answerId')
 //     .put(authCtrl.requireSignin, postCtrl.isAnswerer, postCtrl.editAnswer);
 
 router.param('userId', userCtrl.userByID);
-//router.param('postId', postCtrl.postByID);
+router.param('postId', postCtrl.postByID);
 //router.param('answerId', postCtrl.answerID);
 
 export default router;

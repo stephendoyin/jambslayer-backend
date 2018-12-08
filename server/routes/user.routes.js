@@ -9,7 +9,7 @@ router.route('/api/users')
     .post(userCtrl.create);
 
 router.route('/api/user/:userId')
-    .put(authCtrl.requireSignin, userCtrl.comparePwd, userCtrl.changePwd)
+    .put(authCtrl.requireSignin, authCtrl.hasAuthorization, userCtrl.comparePwd, userCtrl.changePwd)
 
 router.route('/api/users/:userId')
     .get(authCtrl.requireSignin, userCtrl.read)
