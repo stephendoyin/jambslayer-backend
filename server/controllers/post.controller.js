@@ -1,11 +1,12 @@
 import Post from '../models/post.model';
-import Answer from '../models/answers.model';
-import Comment from '../models/comments.model';
-import Reply from '../models/replies.model';
+import User from '../models/user.model';
+
 import _ from 'lodash';
 import errHandler from './../helpers/dbErrorHandler';
 import fs from 'fs';
 import formidable from 'formidable';
+import { request } from 'https';
+import { rejects } from 'assert';
 
 //post new question 
 const createPost = (req, res, next) => {
@@ -72,9 +73,51 @@ const postByID = (req, res, next, id) => {
     })
 };
 
+const addSubInterest = (req, res, next) => {
+    if(req.profile.subject_interests.includes(req.body.sub_interest)){
+        return next();
+    }
+    User.findByIdAndUpdate(req.profile._id, { $push: { subject_interests: req.body.sub_interest } })
+        .exec((err, user) => {
+            if (err) {
+                return res.status(400).json({
+                    error: errorHandler.getErrorMessage(err)
+                });
+            }
+            res.json(user);
+        });
+};
+
+const removeSubInterest = (req, res) => {
+    User.findByIdAndUpdate(req.profile._id, { $pull: { subject_interests: req.body.sub_interest } })
+        .exec((err, user) => {
+            if (err) {
+                return res.status(400).json({
+                    error: errorHandler.getErrorMessage(err)
+                });
+            }
+            res.json(user);
+        });
+};
+
 const listNewsFeed = (req, res) => {
-    console.log(req.profile.subject_interests)
-    Post.find({ tag: { $in: ['maths', 'english'] } })
+    console.log(req.profile.subject_interests);
+    Post.find({ tag: { $in: request.profile.subject_interests } })
+        .populate('postedBy', '_id name')
+        .sort('-created')
+        .exec((err, posts) => {
+            if (err) {
+                return res.status(400).json({
+                    error: errorHandler.getErrorMessage(err)
+                });
+            }
+            res.json(posts)
+        });
+
+};
+
+const listByUser = (req, res) => {
+    Post.find({ postedBy: req.profile._id })
         .populate('postedBy', '_id name')
         .sort('-created')
         .exec((err, posts) => {
@@ -83,108 +126,23 @@ const listNewsFeed = (req, res) => {
                     error: errorHandler.getErrorMessage(err)
                 })
             }
-            res.json(posts)
+            res.json(posts);
         });
-
-};
-
-const createAnswer = (req, res, next) => {
-    let answer = new Answer();
-    answer.content = req.body.content;
-    answer.postedBy = req.profile;
-    answer.postID = req.body.postId;
-    answer.save((err, result) => {
-        if (err) {
-            return res.status(400).json({
-                error: err
-            })
-        }
-        next();
-    })
-}
-
-const answers = (req, res) => {
-    Answer.find({ 'postID': req.body.postId })
-        .sort({ created: 'asc' })
-        .populate('postedBy', ['name', 'created', '_id'])
-        .exec((err, result) => {
-            if (err) {
-                return res.status(400).json({
-                    error: errHandler.getErrorMessage(err)
-                });
-            }
-            res.json(result);
-        });
-};
-
-const comment = (req, res) => {
-    let comment = new Comment();
-    comment.content = req.body.content;
-    comment.postedBy = req.profile;
-    comment.answerID = req.body.answerId;
-    comment.save((err, result) => {
-        if (err) {
-            return res.status(400).json({
-                error: errHandler.getErrorMessage(err)
-            });
-        }
-        Comment.find({ 'answerID': req.body.answerId })
-            .populate('postedBy', ['name', 'created', '_id'])
-            .sort('-created')
-            .exec((err, comments) => {
-                if (err) {
-                    return res.status(400).json({
-                        error: errorHandler.getErrorMessage(err)
-                    });
-                }
-                res.json(comments);
-            });
-    });
-};
-
-const reply = (req, res) => {
-    let reply = new Reply();
-    reply.content = req.body.content;
-    reply.postedBy = req.profile;
-    reply.commentID = req.body.commentId;
-    reply.save((err, result) => {
-        if (err) {
-            return res.status(400).json({
-                error: errHandler.getErrorMessage(err)
-            });
-        }
-        Reply.find({ 'commentID': req.body.commentId })
-            .populate('postedBy', ['name', 'created', '_id'])
-            .sort('-created')
-            .exec((err, replies) => {
-                if (err) {
-                    return res.status(400).json({
-                        error: errorHandler.getErrorMessage(err)
-                    });
-                }
-                res.json(replies);
-            });
-    });
-};
-
-const photo = (req, res, next) => {
-    res.set("Content-Type", req.post.photo.contentType);
-    return res.send(req.post.photo.data);
 };
 
 const remove = (req, res) => {
-    let post = req.post
+    let post = req.post;
     post.remove((err, deletedPost) => {
         if (err) {
             return res.status(400).json({
                 error: errorHandler.getErrorMessage(err)
-            })
+            });
         }
-        res.json(deletedPost)
+        res.json(deletedPost);
         //will call next here to further delete answer,
         //comment and reply related to this post
-    })
-}
+    });
+};
 
 const isPoster = (req, res, next) => {
     let isPoster = req.post && req.auth && req.post.postedBy._id == req.auth._id;
@@ -196,18 +154,22 @@ const isPoster = (req, res, next) => {
     next();
 };
 
+const photo = (req, res, next) => {
+    res.set("Content-Type", req.post.photo.contentType);
+    return res.send(req.post.photo.data);
+};
+
 export default {
     createPost,
     postByID,
-    answers,
-    createAnswer,
-    comment,
-    reply,
     isPoster,
     remove,
     photo,
     like,
     unlike,
-    listNewsFeed
+    listNewsFeed,
+    listByUser,
+    addSubInterest,
+    removeSubInterest
 }
 
