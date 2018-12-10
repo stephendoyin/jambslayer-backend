@@ -6,6 +6,10 @@ const AnswerSchema = new mongoose.Schema({
         type: String,
         required: 'Cannot post empty answer'
     },
+    photo: {
+        data: Buffer,
+        contentType: String
+    },
     created: { type: Date, default: Date.now },
     postedBy: { type: mongoose.Schema.ObjectId, ref: 'User' },
     likes: { type: mongoose.Schema.ObjectId, ref: 'User' },

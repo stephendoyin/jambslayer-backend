@@ -8,6 +8,7 @@ import path from 'path';
 import authRoutes from './routes/auth.routes';
 import postRoutes from './routes/post.routes';
 import userRoutes from './routes/user.routes';
+import answerRoutes from './routes/answer.routes';
 
 const CURRENT_WORKING_DIR = process.cwd();
 const app = express();
@@ -29,6 +30,7 @@ app.use('/dist', express.static(path.join(CURRENT_WORKING_DIR, 'dist')));
 app.use('/', userRoutes);
 app.use('/', authRoutes);
 app.use('/', postRoutes);
+app.use('/', answerRoutes);
 
 // Catch unauthorised errors
 app.use((err, req, res, next) => {

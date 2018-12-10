@@ -5,8 +5,6 @@ import _ from 'lodash';
 import errHandler from './../helpers/dbErrorHandler';
 import fs from 'fs';
 import formidable from 'formidable';
-import { request } from 'https';
-import { rejects } from 'assert';
 
 //post new question 
 const createPost = (req, res, next) => {
@@ -19,7 +17,7 @@ const createPost = (req, res, next) => {
             });
         }
         let post = new Post(fields);
-        post.postedBy = req.profile;
+        post.postedBy = req.profile._id;
         if (files.photo) {
             post.photo.data = fs.readFileSync(files.photo.path);
             post.photo.contentType = files.photo.type;
@@ -33,8 +31,8 @@ const createPost = (req, res, next) => {
             result.postedBy.salt = undefined;
             result.postedBy.hashed_password = undefined;
             res.json(result);
-        })
-    })
+        });
+    });
 };
 
 const like = (req, res) => {
