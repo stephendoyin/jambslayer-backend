@@ -1,7 +1,8 @@
-import express from 'express'
-import userCtrl from '../controllers/user.controller'
-import authCtrl from '../controllers/auth.controller'
-import postCtrl from '../controllers/post.controller'
+import express from 'express';
+import userCtrl from '../controllers/user.controller';
+import authCtrl from '../controllers/auth.controller';
+import postCtrl from '../controllers/post.controller';
+import ansCtrl from '../controllers/answer.controller';
 
 const router = express.Router();
 
@@ -12,6 +13,7 @@ router.route('/api/posts/new/:userId')
 router.route('/api/posts/:postId')
   .delete(authCtrl.requireSignin, postCtrl.isPoster, postCtrl.remove);
 
+//api to get photo if posted  
 router.route('/api/posts/photo/:postId')
   .get(postCtrl.photo);
 
@@ -27,7 +29,7 @@ router.route('/api/posts/unlike')
 router.route('/api/posts/feed/:userId')
   .get(authCtrl.requireSignin, postCtrl.listNewsFeed);
 
-//api to update user interest to return applicable post
+//api to update user interest
 router.route('/api/post/tag/:userId')
   .put(authCtrl.requireSignin, postCtrl.addSubInterest, postCtrl.removeSubInterest);
 
