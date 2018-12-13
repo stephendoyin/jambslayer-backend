@@ -79,6 +79,23 @@ const isCommenter = (req, res, next) => {
     next();
 };
 
+const update = (req, res) => {
+    let comment = req.comment;
+    comment.content = req.body.content;
+    comment.modified = true;
+    comment.save((err, comment) => {
+        if(err){
+            return res.status(400).json({
+                error: errHandler.getErrorMessage(err)
+            });
+        }
+        res.json(comment);
+        // res.status(200).json({
+        //     message: "sucessfully updated comment"
+        // });
+    });
+};
+
 const remove = (req, res) => {
     let comment = req.comment;
     comment.remove((err, deletedComment) => {
@@ -90,6 +107,8 @@ const remove = (req, res) => {
         res.json(deletedComment);
     });
 };
+
+
 // const reply = (req, res) => {
 //     let reply = new Reply();
 //     reply.content = req.body.content;
@@ -124,6 +143,7 @@ export default {
     unlike,
     commentByID,
     remove,
+    update,
     isCommenter
     //reply
 }

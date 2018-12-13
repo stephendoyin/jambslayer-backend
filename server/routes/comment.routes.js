@@ -23,6 +23,8 @@ router.route('/api/post/answer/comment/unlike')
 router.route('/api/post/answer/comment/remove/:commentId')
   .delete(authCtrl.requireSignin, commentCtrl.isCommenter, commentCtrl.remove);
 
+router.route('/api/post/answer/comment/:commentId')
+  .put(authCtrl.requireSignin, commentCtrl.isCommenter, commentCtrl.update);
 
 //api to add reply to comment
 // router.route('/api/post/answer/comment/reply/:userId')

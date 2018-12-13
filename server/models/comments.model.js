@@ -5,7 +5,14 @@ const CommentSchema = new mongoose.Schema({
     likes: [{ type: mongoose.Schema.ObjectId, ref: 'User' }],
     content: String,
     created: { type: Date, default: Date.now },
-    postedBy: { type: mongoose.Schema.ObjectId, ref: 'User' }
+    postedBy: { type: mongoose.Schema.ObjectId, ref: 'User' },
+    modified: Boolean,
+    replies: [{
+        likes: [{ type: mongoose.Schema.ObjectId, ref: 'User' }],
+        content: String,
+        created: { type: Date, default: Date.now },
+        postedBy: { type: mongoose.Schema.ObjectId, ref: 'User' }
+    }]
 });
 
 export default mongoose.model('Comment', CommentSchema);
