@@ -7,16 +7,27 @@ const router = express.Router();
 
 //api to add comment to answers
 router.route('/api/post/answer/comment/:userId')
-  .put(authCtrl.requireSignin, commentCtrl.comment);
+  .post(authCtrl.requireSignin, commentCtrl.comment);
+
+router.route('/api/post/answer/comments')
+  .get(authCtrl.requireSignin, commentCtrl.comments);
+
+//api to like comment
+router.route('/api/post/answer/comment/like')
+  .put(authCtrl.requireSignin, commentCtrl.like);
+
+//api to like an answer
+router.route('/api/post/answer/comment/unlike')
+  .put(authCtrl.requireSignin, commentCtrl.unlike);
+
+router.route('/api/post/answer/comment/remove/:commentId')
+  .delete(authCtrl.requireSignin, commentCtrl.isCommenter, commentCtrl.remove);
+
 
 //api to add reply to comment
-router.route('/api/post/answer/comment/reply/:userId')
-  .put(authCtrl.requireSignin, commentCtrl.reply);
-
-// api to remove comment
-// router.route('/api/post/answer/uncomment')
-//   .put(authCtrl.requireSignin, commentCtrl.uncomment);
+// router.route('/api/post/answer/comment/reply/:userId')
+//   .put(authCtrl.requireSignin, commentCtrl.reply);
 
 router.param('userId', userCtrl.userByID);
-
+router.param('commentId', commentCtrl.commentByID);
 export default router;

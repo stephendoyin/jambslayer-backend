@@ -4,6 +4,7 @@ import errHandler from './../helpers/dbErrorHandler';
 import fs from 'fs';
 import formidable from 'formidable';
 
+//create a new answer 
 const createAnswer = (req, res) => {
     let form = new formidable.IncomingForm();
     form.keepExtensions = true;
@@ -30,7 +31,7 @@ const createAnswer = (req, res) => {
     });
 };
 
-
+//return all answers for a particular post
 const answers = (req, res) => {
     Answer.find({ 'postID': req.body.postID })
         .sort('-created')
@@ -91,8 +92,8 @@ const remove = (req, res) => {
             });
         }
         res.json(deletedAnswer);
-        //will call next here to further delete answer,
-        //comment and reply related to this post
+        //will call next here to further delete answers,
+        //comments and replies associated to this post
     });
 };
 

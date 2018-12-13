@@ -2,11 +2,15 @@
   "name": "jambslayer",
   "version": "1.0.0",
   "description": "",
-  "main": "\u001b[D\u001b[D\u001b[C",
+  "main": "./dist/server.generated.js",
   "scripts": {
     "development": "nodemon",
     "build": "webpack --mode=production --config webpack.config.server.js",
     "start": "NODE_ENV=production node ./dist/server.generated.js"
+  },
+  "engines": {
+    "node": "8.11.3",
+    "npm": "5.6.0"
   },
   "author": "Steve Doyin",
   "license": "ISC",

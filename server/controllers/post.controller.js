@@ -98,6 +98,7 @@ const removeSubInterest = (req, res) => {
         });
 };
 
+//list post by users interest
 const listNewsFeed = (req, res) => {
     console.log(req.profile.subject_interests);
     Post.find({ tag: { $in: request.profile.subject_interests } })
@@ -114,6 +115,7 @@ const listNewsFeed = (req, res) => {
 
 };
 
+//post posted by user specifically
 const listByUser = (req, res) => {
     Post.find({ postedBy: req.profile._id })
         .populate('postedBy', '_id name')
@@ -128,6 +130,7 @@ const listByUser = (req, res) => {
         });
 };
 
+//delete post
 const remove = (req, res) => {
     let post = req.post;
     post.remove((err, deletedPost) => {
