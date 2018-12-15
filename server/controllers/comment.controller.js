@@ -1,5 +1,5 @@
-import Comment from '../models/comments.model';
-//import Reply from '../models/replies.model';
+import Comment from '../models/comment.model';
+import Reply from '../models/reply.model';
 import _ from 'lodash';
 import errHandler from './../helpers/dbErrorHandler';
 
@@ -20,6 +20,14 @@ const comment = (req, res) => {
 //return all comments for a particular answer
 const comments = (req, res) => {
     Comment.find({ 'answerID': req.body.answerID })
+        .populate({
+            path: 'replies',
+            select: 'content _id created',
+            populate: {
+                path: 'postedBy',
+                select: 'name _id',
+            }
+        })
         .populate('postedBy', ['name', 'created', '_id'])
         .sort('-created')
         .exec((err, comments) => {
@@ -70,7 +78,7 @@ const commentByID = (req, res, next, id) => {
 };
 
 const isCommenter = (req, res, next) => {
-    let isCommenter = req.comment && req.auth && req.comment.postedBy._id == req.auth._id;
+    let isCommenter = req.comment && req.auth && req.comment.postedBy._id === req.auth._id;
     if (!isCommenter) {
         return res.status(403).json({
             error: "User is not authorized"
@@ -84,7 +92,7 @@ const update = (req, res) => {
     comment.content = req.body.content;
     comment.modified = true;
     comment.save((err, comment) => {
-        if(err){
+        if (err) {
             return res.status(400).json({
                 error: errHandler.getErrorMessage(err)
             });
@@ -109,32 +117,36 @@ const remove = (req, res) => {
 };
 
 
-// const reply = (req, res) => {
-//     let reply = new Reply();
-//     reply.content = req.body.content;
-//     reply.postedBy = req.profile;
-//     reply.commentID = req.body.commentId;
-//     reply.save((err, result) => {
-//         if (err) {
-//             return res.status(400).json({
-//                 error: errHandler.getErrorMessage(err)
-//             });
-//         }
-//         Reply.find({ 'commentID': req.body.commentId })
-//             .populate('postedBy', ['name', 'created', '_id'])
-//             .sort('-created')
-//             .exec((err, replies) => {
-//                 if (err) {
-//                     return res.status(400).json({
-//                         error: errorHandler.getErrorMessage(err)
-//                     });
-//                 }
-//                 res.json(replies);
-//             });
-//     });
-// };
-
-
+const reply = (req, res) => {
+    let reply = new Reply();
+    reply.content = req.body.content;
+    reply.postedBy = req.body.userId;
+    reply.save((err, reply) => {
+        console.log(reply);
+        if (err) {
+            return res.status(400).json({
+                error: errHandler.getErrorMessage(err)
+            });
+        }
+        Comment.findByIdAndUpdate(req.body.commentId, { $push: { replies: reply } }, { new: true })
+            .populate({
+                path: 'replies',
+                select: 'name _id created',
+                populate: {
+                    path: 'postedBy',
+                    select: 'name _id created',
+                }
+            })
+            .exec((err, comment) => {
+                if (err) {
+                    return res.status(400).json({
+                        error: errHandler.getErrorMessage(err)
+                    });
+                }
+                res.json(comment);
+            });
+    });
+};
 
 export default {
     comment,
@@ -144,6 +156,6 @@ export default {
     commentByID,
     remove,
     update,
-    isCommenter
-    //reply
+    isCommenter,
+    reply
 }

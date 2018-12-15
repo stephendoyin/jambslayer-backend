@@ -1,4 +1,4 @@
-import Answer from '../models/answers.model';
+import Answer from '../models/answer.model';
 import _ from 'lodash';
 import errHandler from './../helpers/dbErrorHandler';
 import fs from 'fs';
