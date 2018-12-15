@@ -1,5 +1,4 @@
 import Comment from '../models/comment.model';
-import Reply from '../models/reply.model';
 import _ from 'lodash';
 import errHandler from './../helpers/dbErrorHandler';
 
@@ -22,7 +21,7 @@ const comments = (req, res) => {
     Comment.find({ 'answerID': req.body.answerID })
         .populate({
             path: 'replies',
-            select: 'content _id created',
+            select: 'content _id created likes',
             populate: {
                 path: 'postedBy',
                 select: 'name _id',
@@ -116,38 +115,6 @@ const remove = (req, res) => {
     });
 };
 
-
-const reply = (req, res) => {
-    let reply = new Reply();
-    reply.content = req.body.content;
-    reply.postedBy = req.body.userId;
-    reply.save((err, reply) => {
-        console.log(reply);
-        if (err) {
-            return res.status(400).json({
-                error: errHandler.getErrorMessage(err)
-            });
-        }
-        Comment.findByIdAndUpdate(req.body.commentId, { $push: { replies: reply } }, { new: true })
-            .populate({
-                path: 'replies',
-                select: 'name _id created',
-                populate: {
-                    path: 'postedBy',
-                    select: 'name _id created',
-                }
-            })
-            .exec((err, comment) => {
-                if (err) {
-                    return res.status(400).json({
-                        error: errHandler.getErrorMessage(err)
-                    });
-                }
-                res.json(comment);
-            });
-    });
-};
-
 export default {
     comment,
     comments,
@@ -156,6 +123,5 @@ export default {
     commentByID,
     remove,
     update,
-    isCommenter,
-    reply
+    isCommenter
 }

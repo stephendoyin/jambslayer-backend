@@ -10,6 +10,7 @@ import postRoutes from './routes/post.routes';
 import userRoutes from './routes/user.routes';
 import answerRoutes from './routes/answer.routes';
 import commentRoutes from './routes/comment.routes';
+import replyRoutes from './routes/reply.routes';
 
 const CURRENT_WORKING_DIR = process.cwd();
 const app = express();
@@ -33,6 +34,7 @@ app.use('/', authRoutes);
 app.use('/', postRoutes);
 app.use('/', answerRoutes);
 app.use('/', commentRoutes);
+app.use('/', replyRoutes);
 
 // Catch unauthorised errors
 app.use((err, req, res, next) => {

@@ -26,10 +26,6 @@ router.route('/api/post/answer/comment/remove/:commentId')
 router.route('/api/post/answer/comment/:commentId')
   .put(authCtrl.requireSignin, commentCtrl.isCommenter, commentCtrl.update);
 
-//api to add reply to comment
-router.route('/api/comment/reply')
-  .put(authCtrl.requireSignin, commentCtrl.reply);
-
 router.param('userId', userCtrl.userByID);
 router.param('commentId', commentCtrl.commentByID);
 export default router;
